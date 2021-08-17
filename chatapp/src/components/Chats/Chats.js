@@ -16,6 +16,12 @@ const Chats = () => {
         await auth.signOut();
         history.push('/'); //renavigate back to login form
     }
+    ///function to handle getting user image
+    const getFile = async (url) => {
+        const response = await fetch(url);
+        const data = await response.blob(); // blob are any files like images transfered over inn binary format 
+        return new File([data], "userPhoto.jpg", {'type': 'image/jpg'});
+    }
     //call this useeffect when this component loads
     useEffect(() => {
         if(!user){
@@ -24,6 +30,7 @@ const Chats = () => {
         }
         //if we do have a user make api request to chat engine
         //the seceond parameters is the options object 
+        //this first call is for trying to get an existing user
         axios.get('https://api.chatengine.io/users/me',{
             headers: {
                 "project-id": "308b1035-04b6-42e7-af3a-088824226875",
@@ -34,13 +41,23 @@ const Chats = () => {
             //set the loading to false 
             setLoading(false);
         }).catch(() => {
+            //this is the second call for not having a existing user 
+            //so you have to create a new user
             let formData = new FormData();
             formData.append('email', user.email);
-            formData.append('username', user.displayName);
+            formData.append('username', user.email);
             formData.append('secret', user.uid);
+            //call function to get user image
+            getFile(user.photoURL).then((avatar) => {
+                formData.append('avatar', avatar, avatar.name);
+                axios.post('https://api.chatengine.io/users/', formData, {headers: { "private-key": "01d94bb6-4754-4978-89ef-3d19821f35db"}}); 
+            }).then(() => {
+                setLoading(false); //if successful setloading to false
+            }).catch((error) => console.log(error)); //if things did not go well console log error
 
         })
     }, [user,history]);
+    if(!user || loading) return 'loading...';
     return (
         <div className="chats-page">
             <div className="nav-bar">
@@ -56,9 +73,9 @@ const Chats = () => {
             </div>
             <ChatEngine
                 height="calc(100vh - 66px)"
-                projectId="308b1035-04b6-42e7-af3a-088824226875"
-                userName="."
-                userSecret="."
+                projectID="308b1035-04b6-42e7-af3a-088824226875"
+                userName={user.email}
+                userSecret={user.uid}
             />
         </div>
     );
