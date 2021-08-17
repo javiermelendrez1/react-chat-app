@@ -9,7 +9,7 @@ export const useAuth = () => useContext(AuthContext);
 //render all jsx passed into auth provider
 export const AuthProvider = ({children}) => {
     const[loading,setLoading] = useState(true); //default loading true
-    const[user,setUser] = useState({}); //empty objct
+    const[user,setUser] = useState(null); //empty objct
     const history = useHistory();
     useEffect(() => {
         //call everytime authstate changes
@@ -17,7 +17,8 @@ export const AuthProvider = ({children}) => {
             //pass in user and set loading to false
             setUser(user);
             setLoading(false);
-            history.push('/chats'); //this will renavigate us to chat applications
+            //only route to /chats if we have the user
+            if(user) history.push('/chats'); //this will renavigate us to chat applications
 
         })
     }, [user, history]) //whenever user or history changes we will reacall useEffect
