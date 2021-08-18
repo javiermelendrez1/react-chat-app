@@ -33,7 +33,7 @@ const Chats = () => {
         //this first call is for trying to get an existing user
         axios.get('https://api.chatengine.io/users/me',{
             headers: {
-                "project-id": "308b1035-04b6-42e7-af3a-088824226875",
+                "project-id": process.env.REACT_APP_CHAT_ENGINE_ID,
                 "user-name": user.email,
                 "user-secret": user.id,
             }
@@ -50,7 +50,7 @@ const Chats = () => {
             //call function to get user image
             getFile(user.photoURL).then((avatar) => {
                 formData.append('avatar', avatar, avatar.name);
-                axios.post('https://api.chatengine.io/users/', formData, {headers: { "private-key": "01d94bb6-4754-4978-89ef-3d19821f35db"}}); 
+                axios.post('https://api.chatengine.io/users/', formData, {headers: { "private-key": process.env.REACT_APP_CHAT_ENGINE_ID}}); 
             }).then(() => {
                 setLoading(false); //if successful setloading to false
             }).catch((error) => console.log(error)); //if things did not go well console log error

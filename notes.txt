@@ -1,0 +1,2 @@
+we use .env to hide private keys and stuff we do not want peoople to see
+process.env.nameOFVariable to include in your app
